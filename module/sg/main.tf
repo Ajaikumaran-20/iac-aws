@@ -4,7 +4,7 @@ provider "aws" {
   access_key = "test"
   secret_key = "test"
 
-  endpoints {
+         endpoints {
     ec2 = "http://localhost:4566"
   }
 

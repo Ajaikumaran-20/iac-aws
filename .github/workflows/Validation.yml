@@ -2,7 +2,7 @@ name: TEST-MASTER
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ${{github.ref_name }}
   # workflow_dispatch: # optional manual trigger
 
 jobs:
