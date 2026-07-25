@@ -1,34 +1,53 @@
 resource "aws_cloudfront_distribution" "main" {
-  enabled         = true
-  is_ipv6_enabled = false
-  price_class     = var.cloudfront_price_class
-  comment         = "${local.name_prefix}-cloudfront"
+  enabled = true
+
+  comment = "${local.name_prefix}-cloudfront"
 
   origin {
     domain_name = aws_lb.app.dns_name
-    origin_id   = "alb-origin"
+    origin_id   = "${local.name_prefix}-alb-origin"
 
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+      origin_protocol_policy = "http-only"
+
+      origin_ssl_protocols = [
+        "TLSv1.2"
+      ]
     }
   }
 
   default_cache_behavior {
-    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = "alb-origin"
+    target_origin_id       = "${local.name_prefix}-alb-origin"
     viewer_protocol_policy = "redirect-to-https"
-    compress               = true
+
+    allowed_methods = [
+      "GET",
+      "HEAD",
+      "OPTIONS",
+      "PUT",
+      "POST",
+      "PATCH",
+      "DELETE"
+    ]
+
+    cached_methods = [
+      "GET",
+      "HEAD"
+    ]
 
     forwarded_values {
       query_string = true
+
       cookies {
         forward = "all"
       }
     }
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 0
   }
 
   restrictions {
@@ -37,12 +56,13 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  # Remove ACM reference since Cloudflare handles SSL
+  # Use CloudFront's default HTTPS certificate.
+  # No ACM certificate is required.
+  # No custom aliases are used.
+
   viewer_certificate {
     cloudfront_default_certificate = true
   }
-
-  aliases = [local.www_fqdn]
 
   tags = {
     Name = "${local.name_prefix}-cloudfront"
