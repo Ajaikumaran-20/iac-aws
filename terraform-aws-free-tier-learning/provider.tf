@@ -1,7 +1,5 @@
-# Main AWS provider
-# GitHub Actions OIDC already authenticates as terraform-role
 provider "aws" {
-  region = "ap-south-1"
+  region = var.aws_region
 
   default_tags {
     tags = {
@@ -14,9 +12,6 @@ provider "aws" {
   }
 }
 
-# US East 1 provider
-# Required for resources that must be created in us-east-1,
-# such as ACM certificates used by CloudFront
 provider "aws" {
   alias  = "us_east_1"
   region = "us-east-1"
@@ -30,4 +25,8 @@ provider "aws" {
       ManagedBy   = "Terraform"
     }
   }
+}
+
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
 }
