@@ -1,0 +1,38 @@
+aws_region         = "ap-south-1"
+aws_account_id     = "614939597046"
+terraform_role_arn = "arn:aws:iam::614939597046:role/terraform-role"
+
+client      = "besant"
+group       = "besant"
+environment = "demo"
+
+vpc_cidr = "10.0.0.0/16"
+
+availability_zone        = "ap-south-1a"
+second_availability_zone = "ap-south-1b"
+
+public_subnet_1_cidr = "10.0.0.0/24"
+public_subnet_2_cidr = "10.0.1.0/24"
+private_subnet_cidr  = "10.0.2.0/24"
+
+ami_id        = "ami-04f98ffda660de4f0"
+instance_type = "t3.micro"
+
+key_pair_name = "playground-key-pair"
+
+min_size         = 1
+desired_capacity = 1
+max_size         = 1
+
+application_port  = 80
+health_check_path = "/"
+
+ssh_allowed_cidrs = ["10.0.0.0/16", "49.36.123.45/32"]
+
+domain_name = "terraform.dev"
+
+cloudfront_price_class = "PriceClass_100"
+
+dns_provider         = "cloudflare"
+cloudflare_api_token = ""
+cloudflare_zone_id   = ""
