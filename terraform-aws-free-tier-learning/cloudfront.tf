@@ -5,6 +5,7 @@ resource "aws_cloudfront_distribution" "main" {
     "www.terraform.dev"
   ]
 
+  # Your origin
   origin {
     domain_name = aws_lb.app.dns_name
     origin_id   = "alb-origin"
@@ -22,6 +23,7 @@ resource "aws_cloudfront_distribution" "main" {
 
   default_cache_behavior {
     target_origin_id       = "alb-origin"
+
     viewer_protocol_policy = "redirect-to-https"
 
     allowed_methods = [
@@ -63,8 +65,4 @@ resource "aws_cloudfront_distribution" "main" {
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
-
-  depends_on = [
-    aws_acm_certificate_validation.cloudfront
-  ]
 }

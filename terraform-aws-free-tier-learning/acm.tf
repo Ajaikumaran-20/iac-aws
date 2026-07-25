@@ -3,9 +3,8 @@
 resource "aws_acm_certificate" "cloudfront" {
   provider = aws.us_east_1
 
-  domain_name = "www.terraform.dev"
-
-  validation_method = "DNS"
+  domain_name       = "www.terraform.dev"
+  validation_method = "EMAIL"
 
   lifecycle {
     create_before_destroy = true
