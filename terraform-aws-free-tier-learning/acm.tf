@@ -1,16 +1,13 @@
+
+
 resource "aws_acm_certificate" "cloudfront" {
   provider = aws.us_east_1
 
-  domain_name = local.www_fqdn
-
+  domain_name       = local.www_fqdn
   validation_method = "DNS"
 
   lifecycle {
     create_before_destroy = true
-  }
-
-  tags = {
-    Name = "${local.name_prefix}-cloudfront-acm"
   }
 }
 resource "aws_acm_certificate_validation" "cloudfront" {
