@@ -4,7 +4,7 @@ resource "cloudflare_record" "www" {
   zone_id = var.cloudflare_zone_id
   name    = "@"
   type    = "CNAME"
-  value   = aws_cloudfront_distribution.main.domain_name
+  content = aws_cloudfront_distribution.main.domain_name
   ttl     = 1
   proxied = true
 }
