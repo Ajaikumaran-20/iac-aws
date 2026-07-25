@@ -40,6 +40,10 @@ jobs:
     name: Terraform
     runs-on: ubuntu-latest
 
+    # IMPORTANT:
+    # Cloudflare secrets are stored in the "demo" GitHub Environment.
+    environment: demo
+
     defaults:
       run:
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -79,7 +83,6 @@ jobs:
 
       # --------------------------------------------------
       # Create terraform.tfvars
-      # Values come from GitHub Secrets
       # --------------------------------------------------
       - name: Create terraform.tfvars
         shell: bash
