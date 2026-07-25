@@ -3,6 +3,10 @@ resource "aws_cloudfront_distribution" "main" {
 
   comment = "${local.name_prefix}-cloudfront"
 
+  aliases = [
+    local.www_fqdn
+  ]
+
   origin {
     domain_name = aws_lb.app.dns_name
     origin_id   = "${local.name_prefix}-alb-origin"
@@ -56,13 +60,15 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  # Use CloudFront's default HTTPS certificate.
-  # No ACM certificate is required.
-  # No custom aliases are used.
-
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
+
+  depends_on = [
+    aws_acm_certificate_validation.cloudfront
+  ]
 
   tags = {
     Name = "${local.name_prefix}-cloudfront"
