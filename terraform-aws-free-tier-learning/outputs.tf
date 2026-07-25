@@ -58,14 +58,11 @@ output "cloudfront_domain_name" {
   value = aws_cloudfront_distribution.main.domain_name
 }
 
-output "cloudfront_acm_certificate_arn" {
-  value = aws_acm_certificate.cloudfront.arn
-}
-
-output "alb_acm_certificate_arn" {
-  value = aws_acm_certificate.alb.arn
-}
+# ACM not required if Cloudflare handles SSL
+# output "cloudfront_acm_certificate_arn" {
+#   value = aws_acm_certificate.cloudfront.arn
+# }
 
 output "application_url" {
-  value = var.dns_provider == "cloudflare" ? "https://${aws_cloudfront_distribution.main.domain_name}" : local.app_url
+  value = var.dns_provider == "cloudflare" ? "https://${local.www_fqdn}" : local.app_url
 }
