@@ -6,13 +6,19 @@ resource "cloudflare_record" "cloudfront_validation" {
 
   zone_id = var.cloudflare_zone_id
 
-  name = trimsuffix(
-    replace(
-      each.value.resource_record_name,
-      ".terraform.dev.",
-      ""
-    ),
-    "."
+  # ACM gives:
+  # _260e9ae0feaef7a8058c97e2a19138e9.www.terraform.dev.
+  #
+  # Cloudflare zone is:
+  # terraform.dev
+  #
+  # Therefore record name must be:
+  # _260e9ae0feaef7a8058c97e2a19138e9.www
+
+  name = replace(
+    trimsuffix(each.value.resource_record_name, "."),
+    ".terraform.dev",
+    ""
   )
 
   type    = each.value.resource_record_type
