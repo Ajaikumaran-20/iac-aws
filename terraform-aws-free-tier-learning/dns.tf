@@ -10,12 +10,7 @@ resource "cloudflare_record" "cloudfront_validation" {
 
   zone_id = var.cloudflare_zone_id
 
-  name = replace(
-    trim(each.value.name, "."),
-    ".${var.domain_name}",
-    ""
-  )
-
+  name    = each.value.name
   type    = each.value.type
   content = each.value.value
 
