@@ -11,17 +11,17 @@ resource "aws_acm_certificate" "cloudfront" {
   }
 }
 
-resource "aws_acm_certificate_validation" "cloudfront" {
-  provider = aws.us_east_1
+# resource "aws_acm_certificate_validation" "cloudfront" {
+#   provider = aws.us_east_1
 
-  certificate_arn = aws_acm_certificate.cloudfront.arn
+#   certificate_arn = aws_acm_certificate.cloudfront.arn
 
-  validation_record_fqdns = [
-    for record in cloudflare_record.cloudfront_validation :
-    record.hostname
-  ]
+#   validation_record_fqdns = [
+#     for record in cloudflare_record.cloudfront_validation :
+#     record.hostname
+#   ]
 
-  depends_on = [
-    cloudflare_record.cloudfront_validation
-  ]
-}
+#   depends_on = [
+#     cloudflare_record.cloudfront_validation
+#   ]
+# }
