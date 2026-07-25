@@ -23,9 +23,10 @@ on:
           - validate
           - plan
           - apply
-          - destroy-plan
           - destroy
+          - destroy-plan
 
+# Required for GitHub OIDC authentication
 permissions:
   contents: read
   id-token: write
@@ -36,39 +37,36 @@ env:
   AWS_REGION: ${{ vars.AWS_REGION || 'ap-south-1' }}
 
 jobs:
-
   terraform:
     name: Terraform
     runs-on: ubuntu-latest
 
+    # GitHub Environment
     environment: demo
 
     defaults:
       run:
-        working-directory: terraform-aws-free-tier-learning
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
     steps:
 
       # --------------------------------------------------
-      # 1. Checkout Repository
+      # Checkout
       # --------------------------------------------------
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
       # --------------------------------------------------
-      # 2. Setup Terraform
+      # Setup Terraform
       # --------------------------------------------------
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
       # --------------------------------------------------
-      # 3. Configure AWS using GitHub OIDC
+      # Configure AWS credentials using GitHub OIDC
       # --------------------------------------------------
-
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -77,21 +75,21 @@ jobs:
           role-session-name: GitHubActionsTerraform
 
       # --------------------------------------------------
-      # 4. Verify AWS Identity
+      # Verify AWS authentication
       # --------------------------------------------------
-
       - name: Verify AWS identity
-        run: aws sts get-caller-identity
+        run: |
+          aws sts get-caller-identity
 
       # --------------------------------------------------
-      # 5. Create Terraform Variables
+      # Create Terraform variables file
       # --------------------------------------------------
-
       - name: Create terraform.tfvars
         run: |
-          cat > terraform.tfvars <<EOF
+          cat > terraform.tfvars <<'EOF'
           aws_region               = "${{ env.AWS_REGION }}"
           aws_account_id           = "${{ secrets.AWS_ACCOUNT_ID }}"
+          terraform_role_arn       = "${{ secrets.TF_VAR_TERRAFORM_ROLE_ARN }}"
 
           client                   = "${{ secrets.TF_VAR_CLIENT }}"
           group                    = "${{ secrets.TF_VAR_GROUP }}"
@@ -111,10 +109,6 @@ jobs:
 
           key_pair_name            = "${{ secrets.TF_VAR_KEY_PAIR_NAME }}"
 
-          min_size                 = 1
-          desired_capacity         = 1
-          max_size                 = 1
-
           application_port         = 80
           health_check_path        = "/"
 
@@ -131,9 +125,8 @@ jobs:
           EOF
 
       # --------------------------------------------------
-      # 6. Terraform Init
+      # Terraform Init
       # --------------------------------------------------
-
       - name: Terraform Init
         if: >
           github.event_name != 'workflow_dispatch' ||
@@ -141,28 +134,26 @@ jobs:
           github.event.inputs.action == 'validate' ||
           github.event.inputs.action == 'plan' ||
           github.event.inputs.action == 'apply' ||
-          github.event.inputs.action == 'destroy-plan' ||
-          github.event.inputs.action == 'destroy'
+          github.event.inputs.action == 'destroy' ||
+          github.event.inputs.action == 'destroy-plan'
         run: terraform init -input=false
 
       # --------------------------------------------------
-      # 7. Terraform Validate
+      # Terraform Validate
       # --------------------------------------------------
-
       - name: Terraform Validate
         if: >
           github.event_name != 'workflow_dispatch' ||
           github.event.inputs.action == 'validate' ||
           github.event.inputs.action == 'plan' ||
           github.event.inputs.action == 'apply' ||
-          github.event.inputs.action == 'destroy-plan' ||
-          github.event.inputs.action == 'destroy'
+          github.event.inputs.action == 'destroy' ||
+          github.event.inputs.action == 'destroy-plan'
         run: terraform validate
 
       # --------------------------------------------------
-      # 8. Terraform Plan
+      # Terraform Plan
       # --------------------------------------------------
-
       - name: Terraform Plan
         if: >
           github.event_name != 'workflow_dispatch' ||
@@ -175,9 +166,8 @@ jobs:
             -out=tfplan
 
       # --------------------------------------------------
-      # 9. Terraform Apply
+      # Terraform Apply
       # --------------------------------------------------
-
       - name: Terraform Apply
         if: >
           github.event_name == 'workflow_dispatch' &&
@@ -185,12 +175,12 @@ jobs:
         run: |
           terraform apply \
             -input=false \
+            -var-file=terraform.tfvars \
             tfplan
 
       # --------------------------------------------------
-      # 10. Terraform Destroy Plan
+      # Terraform Destroy Plan
       # --------------------------------------------------
-
       - name: Terraform Destroy Plan
         if: >
           github.event_name == 'workflow_dispatch' &&
@@ -203,9 +193,8 @@ jobs:
             -out=tfplan-destroy
 
       # --------------------------------------------------
-      # 11. Terraform Destroy
+      # Terraform Destroy
       # --------------------------------------------------
-
       - name: Terraform Destroy
         if: >
           github.event_name == 'workflow_dispatch' &&
