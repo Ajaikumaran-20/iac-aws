@@ -10,21 +10,25 @@ resource "cloudflare_record" "cloudfront_validation" {
 
   zone_id = var.cloudflare_zone_id
 
-  name    = each.value.name
+  # Remove trailing dot and zone name
+  name = replace(
+    trimsuffix(each.value.name, "."),
+    ".${var.domain_name}",
+    ""
+  )
+
   type    = each.value.type
   content = each.value.value
 
   ttl     = 1
   proxied = false
 }
-resource "cloudflare_record" "www" {
-  count = var.dns_provider == "cloudflare" ? 1 : 0
 
+resource "cloudflare_record" "www" {
   zone_id = var.cloudflare_zone_id
 
-  name = "www"
-  type = "CNAME"
-
+  name    = "www"
+  type    = "CNAME"
   content = aws_cloudfront_distribution.main.domain_name
 
   ttl     = 1

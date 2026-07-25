@@ -19,8 +19,4 @@ resource "aws_acm_certificate_validation" "cloudfront" {
     for record in cloudflare_record.cloudfront_validation :
     record.hostname
   ]
-
-  depends_on = [
-    cloudflare_record.cloudfront_validation
-  ]
 }
