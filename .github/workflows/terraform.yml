@@ -34,15 +34,12 @@ permissions:
 env:
   TF_VERSION: "1.8.5"
   TF_WORKING_DIR: "terraform-aws-free-tier-learning"
-  AWS_REGION: ${{ vars.AWS_REGION || 'ap-south-1' }}
+  AWS_REGION: "ap-south-1"
 
 jobs:
   terraform:
     name: Terraform
     runs-on: ubuntu-latest
-
-    # GitHub Environment
-    environment: demo
 
     defaults:
       run:
@@ -70,7 +67,7 @@ jobs:
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.TF_VAR_TERRAFORM_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::614939597046:role/terraform-role
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: GitHubActionsTerraform
 
@@ -80,49 +77,6 @@ jobs:
       - name: Verify AWS identity
         run: |
           aws sts get-caller-identity
-
-      # --------------------------------------------------
-      # Create Terraform variables file
-      # --------------------------------------------------
-      - name: Create terraform.tfvars
-        run: |
-          cat > terraform.tfvars <<'EOF'
-          aws_region               = "${{ env.AWS_REGION }}"
-          aws_account_id           = "${{ secrets.AWS_ACCOUNT_ID }}"
-          terraform_role_arn       = "${{ secrets.TF_VAR_TERRAFORM_ROLE_ARN }}"
-
-          client                   = "${{ secrets.TF_VAR_CLIENT }}"
-          group                    = "${{ secrets.TF_VAR_GROUP }}"
-          environment              = "${{ secrets.TF_VAR_ENVIRONMENT }}"
-
-          vpc_cidr                 = "10.0.0.0/16"
-
-          availability_zone        = "${{ secrets.TF_VAR_AVAILABILITY_ZONE }}"
-          second_availability_zone = "${{ secrets.TF_VAR_SECOND_AVAILABILITY_ZONE }}"
-
-          public_subnet_1_cidr     = "${{ secrets.TF_VAR_PUBLIC_SUBNET_1_CIDR }}"
-          public_subnet_2_cidr     = "${{ secrets.TF_VAR_PUBLIC_SUBNET_2_CIDR }}"
-          private_subnet_cidr      = "${{ secrets.TF_VAR_PRIVATE_SUBNET_CIDR }}"
-
-          ami_id                   = "${{ secrets.TF_VAR_AMI_ID }}"
-          instance_type            = "t3.micro"
-
-          key_pair_name            = "${{ secrets.TF_VAR_KEY_PAIR_NAME }}"
-
-          application_port         = 80
-          health_check_path        = "/"
-
-          ssh_allowed_cidrs        = ["10.0.0.0/16"]
-
-          domain_name              = "${{ secrets.TF_VAR_DOMAIN_NAME }}"
-
-          cloudfront_price_class   = "PriceClass_100"
-
-          dns_provider             = "cloudflare"
-
-          cloudflare_api_token     = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
-          cloudflare_zone_id       = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
-          EOF
 
       # --------------------------------------------------
       # Terraform Init
@@ -175,7 +129,6 @@ jobs:
         run: |
           terraform apply \
             -input=false \
-            -var-file=terraform.tfvars \
             tfplan
 
       # --------------------------------------------------
