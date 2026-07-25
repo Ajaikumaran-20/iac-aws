@@ -3,13 +3,14 @@
 resource "aws_acm_certificate" "cloudfront" {
   provider = aws.us_east_1
 
-  domain_name       = local.www_fqdn
+  domain_name       = "www.terraform.dev"
   validation_method = "DNS"
 
   lifecycle {
     create_before_destroy = true
   }
 }
+
 resource "aws_acm_certificate_validation" "cloudfront" {
   provider = aws.us_east_1
 
@@ -18,5 +19,9 @@ resource "aws_acm_certificate_validation" "cloudfront" {
   validation_record_fqdns = [
     for record in cloudflare_record.cloudfront_validation :
     record.hostname
+  ]
+
+  depends_on = [
+    cloudflare_record.cloudfront_validation
   ]
 }

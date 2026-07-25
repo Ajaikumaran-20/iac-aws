@@ -1,15 +1,13 @@
 resource "aws_cloudfront_distribution" "main" {
   enabled = true
 
-  comment = "${local.name_prefix}-cloudfront"
-
   aliases = [
-    local.www_fqdn
+    "www.terraform.dev"
   ]
 
   origin {
     domain_name = aws_lb.app.dns_name
-    origin_id   = "${local.name_prefix}-alb-origin"
+    origin_id   = "alb-origin"
 
     custom_origin_config {
       http_port              = 80
@@ -23,7 +21,7 @@ resource "aws_cloudfront_distribution" "main" {
   }
 
   default_cache_behavior {
-    target_origin_id       = "${local.name_prefix}-alb-origin"
+    target_origin_id       = "alb-origin"
     viewer_protocol_policy = "redirect-to-https"
 
     allowed_methods = [
@@ -69,8 +67,4 @@ resource "aws_cloudfront_distribution" "main" {
   depends_on = [
     aws_acm_certificate_validation.cloudfront
   ]
-
-  tags = {
-    Name = "${local.name_prefix}-cloudfront"
-  }
 }

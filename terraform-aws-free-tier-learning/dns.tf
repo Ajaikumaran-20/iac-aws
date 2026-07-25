@@ -1,26 +1,24 @@
 resource "cloudflare_record" "cloudfront_validation" {
   for_each = {
     for dvo in aws_acm_certificate.cloudfront.domain_validation_options :
-    dvo.domain_name => {
-      name  = dvo.resource_record_name
-      value = dvo.resource_record_value
-      type  = dvo.resource_record_type
-    }
+    dvo.domain_name => dvo
   }
 
   zone_id = var.cloudflare_zone_id
 
-  # Remove trailing dot and zone name
-  name = replace(
-    trimsuffix(each.value.name, "."),
-    ".${var.domain_name}",
-    ""
+  name = trimsuffix(
+    replace(
+      each.value.resource_record_name,
+      ".terraform.dev.",
+      ""
+    ),
+    "."
   )
 
-  type    = each.value.type
-  content = each.value.value
+  type    = each.value.resource_record_type
+  content = each.value.resource_record_value
 
-  ttl     = 1
+  ttl     = 60
   proxied = false
 }
 
