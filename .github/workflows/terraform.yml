@@ -92,8 +92,8 @@ jobs:
           aws_account_id     = "614939597046"
           terraform_role_arn = "arn:aws:iam::614939597046:role/terraform-role"
 
-          client      = "ajai"
-          group       = "aws"
+          client      = "besant"
+          group       = "besant"
           environment = "demo"
 
           vpc_cidr = "10.0.0.0/16"
