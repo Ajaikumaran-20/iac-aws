@@ -2,8 +2,8 @@ aws_region         = "ap-south-1"
 aws_account_id     = "614939597046"
 terraform_role_arn = "arn:aws:iam::614939597046:role/terraform-role"
 
-client      = "besant"
-group       = "besant"
+client      = "ajai"
+group       = "aws"
 environment = "demo"
 
 vpc_cidr = "10.0.0.0/16"
@@ -13,9 +13,10 @@ second_availability_zone = "ap-south-1b"
 
 public_subnet_1_cidr = "10.0.0.0/24"
 public_subnet_2_cidr = "10.0.1.0/24"
-private_subnet_cidr  = "10.0.2.0/24"
+private_subnet_1_cidr  = "10.0.2.0/24"
+private_subnet_2_cidr  = "10.0.3.0/24"
 
-ami_id        = "ami-04f98ffda660de4f0"
+ami_id        = "ami-03154336a1808e7a0"
 instance_type = "t3.micro"
 
 key_pair_name = "playground-key-pair"
