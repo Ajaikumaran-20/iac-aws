@@ -1,6 +1,6 @@
 resource "aws_lb" "app" {
   name               = "${local.name_prefix}-alb"
-  internal           = false
+  internal           = true
   load_balancer_type = "application"
 
   security_groups = [
