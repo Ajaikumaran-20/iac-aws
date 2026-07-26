@@ -2,9 +2,9 @@ resource "aws_cloudfront_distribution" "main" {
   enabled = true
 
   # Custom domain / free subdomain
-  aliases = [
-    "my-terraform.crabdance.com"
-  ]
+  # aliases = [
+  #   "my-terraform.crabdance.com"
+  # ]
 
   # ALB as CloudFront origin
   origin {
@@ -68,6 +68,5 @@ resource "aws_cloudfront_distribution" "main" {
   # ACM certificate manually created in us-east-1
   viewer_certificate {
         cloudfront_default_certificate = true
-
   }
 }
