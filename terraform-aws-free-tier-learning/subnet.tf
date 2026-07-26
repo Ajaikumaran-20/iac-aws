@@ -34,7 +34,7 @@ resource "aws_subnet" "private_1" {
 resource "aws_subnet" "private_2" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.private_subnet_2_cidr
-  availability_zone       = var.availability_zone
+  availability_zone       = var.second_availability_zone
   map_public_ip_on_launch = false
 
   tags = {
