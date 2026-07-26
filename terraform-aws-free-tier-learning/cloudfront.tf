@@ -67,8 +67,7 @@ resource "aws_cloudfront_distribution" "main" {
 
   # ACM certificate manually created in us-east-1
   viewer_certificate {
-    acm_certificate_arn      = "arn:aws:acm:us-east-1:614939597046:certificate/99e15f26-ca82-4f11-aaf7-277ac383ed1b"
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+        cloudfront_default_certificate = true
+
   }
 }
