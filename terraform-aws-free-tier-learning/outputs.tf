@@ -46,9 +46,9 @@ output "ec2_security_group_id" {
   value = aws_security_group.ec2_sg.id
 }
 
-output "route53_hosted_zone_id" {
-  value = ""
-}
+# output "route53_hosted_zone_id" {
+#   value = ""
+# }
 
 output "cloudfront_distribution_id" {
   value = aws_cloudfront_distribution.main.id
@@ -63,6 +63,6 @@ output "cloudfront_domain_name" {
 #   value = aws_acm_certificate.cloudfront.arn
 # }
 
-output "application_url" {
-  value = var.dns_provider == "cloudflare" ? "https://${local.www_fqdn}" : local.app_url
-}
+# output "application_url" {
+#   value = var.dns_provider == "cloudflare" ? "https://${local.www_fqdn}" : local.app_url
+# }

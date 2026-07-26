@@ -1,15 +1,15 @@
 
 
-resource "aws_acm_certificate" "cloudfront" {
-  provider = aws.us_east_1
+# resource "aws_acm_certificate" "cloudfront" {
+#   provider = aws.us_east_1
 
-  domain_name       = "www.terraform.dev"
-  validation_method = "EMAIL"
+#   domain_name       = "www.terraform.dev"
+#   validation_method = "DNS"
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
 # resource "aws_acm_certificate_validation" "cloudfront" {
 #   provider = aws.us_east_1
