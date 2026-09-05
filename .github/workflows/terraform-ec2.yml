@@ -1,0 +1,133 @@
+name: Standalone EC2 Terraform
+
+on:
+  push:
+    branches:
+      - main
+      - terraform-free-tier-learning
+    paths:
+      - "terraform-aws-ec2-learning/**"
+      - ".github/workflows/terraform-ec2.yml"
+
+  pull_request:
+    branches:
+      - main
+      - terraform-free-tier-learning
+    paths:
+      - "terraform-aws-ec2-learning/**"
+      - ".github/workflows/terraform-ec2.yml"
+
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Choose Terraform action"
+        required: true
+        default: "plan"
+        type: choice
+        options:
+          - init
+          - validate
+          - plan
+          - apply
+          - destroy
+          - destroy-plan
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  TF_VERSION: "1.8.5"
+  TF_WORKING_DIR: "terraform-aws-ec2-learning"
+  AWS_REGION: "ap-south-1"
+
+jobs:
+  terraform:
+    name: Standalone EC2 Terraform
+    runs-on: ubuntu-latest
+    environment: demo
+
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::614939597046:role/terraform-role
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: GitHubActionsTerraformEC2
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      - name: Create terraform.tfvars
+        shell: bash
+        run: |
+          cat > terraform.tfvars <<EOF
+          aws_region       = "${AWS_REGION}"
+          client            = "ajai"
+          group             = "aws-ec2"
+          environment       = "demo"
+          availability_zone = "ap-south-1a"
+          ami_id            = "ami-08f54c8a94c7db14b"
+          instance_type     = "t3.micro"
+          key_pair_name     = "playground-key-pair"
+          ssh_allowed_cidrs = ["49.36.123.45/32"]
+          application_port  = 80
+          EOF
+
+      - name: Terraform Init
+        if: >
+          github.event_name != 'workflow_dispatch' ||
+          github.event.inputs.action == 'init' ||
+          github.event.inputs.action == 'validate' ||
+          github.event.inputs.action == 'plan' ||
+          github.event.inputs.action == 'apply' ||
+          github.event.inputs.action == 'destroy' ||
+          github.event.inputs.action == 'destroy-plan'
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        if: >
+          github.event_name != 'workflow_dispatch' ||
+          github.event.inputs.action == 'validate' ||
+          github.event.inputs.action == 'plan' ||
+          github.event.inputs.action == 'apply' ||
+          github.event.inputs.action == 'destroy' ||
+          github.event.inputs.action == 'destroy-plan'
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: >
+          github.event_name != 'workflow_dispatch' ||
+          github.event.inputs.action == 'plan' ||
+          github.event.inputs.action == 'apply'
+        run: terraform plan -input=false -var-file=terraform.tfvars -out=tfplan
+
+      - name: Terraform Apply
+        if: >
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.action == 'apply'
+        run: terraform apply -input=false tfplan
+
+      - name: Terraform Destroy Plan
+        if: >
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.action == 'destroy-plan'
+        run: terraform plan -destroy -input=false -var-file=terraform.tfvars -out=tfplan-destroy
+
+      - name: Terraform Destroy
+        if: >
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.action == 'destroy'
+        run: terraform destroy -auto-approve -input=false -var-file=terraform.tfvars

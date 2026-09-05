@@ -1,0 +1,14 @@
+aws_region  = "ap-south-1"
+client      = "besant"
+group       = "besant"
+environment = "demo"
+
+availability_zone = "ap-south-1a"
+ami_id            = "ami-xxxxxxxxxxxxxxxxx"
+instance_type     = "t3.micro"
+
+# Use an existing EC2 key pair to enable SSH.
+key_pair_name     = "playground-key-pair"
+ssh_allowed_cidrs = ["YOUR_PUBLIC_IP/32"]
+
+application_port = 80
